@@ -7,7 +7,7 @@ using namespace std;
 string chooseWord();
 void update(const string& secretWord, char guess, string &guessedWord);
 bool contains(char guess, const string& secretWord);
-void render(string& guessedWord, int badGuessCount);
+void render(string& guessedWord, int& badGuessCount);
 char readAGuess();
 
 const int MAX_BAD_GUESSES = 7;
@@ -270,7 +270,7 @@ const string fig[] = {
 " -----            \n"
 };
 
-void render(string& guessedWord, int badGuessCount) {
+void render(string& guessedWord, int& badGuessCount) {
     cout << fig[badGuessCount] << endl;
     cout << guessedWord << endl;
     cout << "Number of wrong guesses: " << badGuessCount << endl;
