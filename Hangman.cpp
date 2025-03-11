@@ -3,6 +3,79 @@
 
 using namespace std;
 
+const string fig[] = {
+"   -------------  \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+" -----            \n",
+
+"   -------------  \n"
+"   |           |  \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+" -----            \n",
+
+"   -------------  \n"
+"   |           |  \n"
+"   |           0  \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+" -----            \n",
+
+"   -------------  \n"
+"   |           |  \n"
+"   |           0  \n"
+"   |           |  \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+" -----            \n",
+
+"   -------------  \n"
+"   |           |  \n"
+"   |           0  \n"
+"   |          /|  \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+" -----            \n",
+
+"   -------------  \n"
+"   |           |  \n"
+"   |           0  \n"
+"   |          /|\\ \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+" -----            \n",
+
+"   -------------  \n"
+"   |           |  \n"
+"   |           0  \n"
+"   |          /|\\ \n"
+"   |          /   \n"
+"   |              \n"
+"   |              \n"
+" -----            \n",
+
+"   -------------  \n"
+"   |           |  \n"
+"   |           0  \n"
+"   |          /|\\ \n"
+"   |          / \\ \n"
+"   |              \n"
+"   |              \n"
+" -----            \n"
+};
 string chooseWord();
 void update(string secretWord, char guess, string &guessedWord);
 bool contains(char guess, string secretWord);
@@ -55,6 +128,7 @@ char readAGuess() {
 }
 
 void render(string guessedWord, int badGuessCount) {
+    cout << fig[badGuessCount] << endl;
     cout << guessedWord << endl;
     cout << "Number of wrong guesses: " << badGuessCount << endl;
 }
