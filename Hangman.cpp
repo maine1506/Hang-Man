@@ -1,88 +1,17 @@
 #include <iostream>
 #include <ctime>
+#include <cctype>
 
 using namespace std;
 
-const string fig[] = {
-"   -------------  \n"
-"   |              \n"
-"   |              \n"
-"   |              \n"
-"   |              \n"
-"   |              \n"
-"   |              \n"
-" -----            \n",
-
-"   -------------  \n"
-"   |           |  \n"
-"   |              \n"
-"   |              \n"
-"   |              \n"
-"   |              \n"
-"   |              \n"
-" -----            \n",
-
-"   -------------  \n"
-"   |           |  \n"
-"   |           0  \n"
-"   |              \n"
-"   |              \n"
-"   |              \n"
-"   |              \n"
-" -----            \n",
-
-"   -------------  \n"
-"   |           |  \n"
-"   |           0  \n"
-"   |           |  \n"
-"   |              \n"
-"   |              \n"
-"   |              \n"
-" -----            \n",
-
-"   -------------  \n"
-"   |           |  \n"
-"   |           0  \n"
-"   |          /|  \n"
-"   |              \n"
-"   |              \n"
-"   |              \n"
-" -----            \n",
-
-"   -------------  \n"
-"   |           |  \n"
-"   |           0  \n"
-"   |          /|\\ \n"
-"   |              \n"
-"   |              \n"
-"   |              \n"
-" -----            \n",
-
-"   -------------  \n"
-"   |           |  \n"
-"   |           0  \n"
-"   |          /|\\ \n"
-"   |          /   \n"
-"   |              \n"
-"   |              \n"
-" -----            \n",
-
-"   -------------  \n"
-"   |           |  \n"
-"   |           0  \n"
-"   |          /|\\ \n"
-"   |          / \\ \n"
-"   |              \n"
-"   |              \n"
-" -----            \n"
-};
 string chooseWord();
-void update(string secretWord, char guess, string &guessedWord);
-bool contains(char guess, string secretWord);
-void render(string guessedWord, int badGuessCount);
+void update(const string& secretWord, char guess, string &guessedWord);
+bool contains(char guess, const string& secretWord);
+void render(string& guessedWord, int badGuessCount);
 char readAGuess();
-const int MAX_BAD_GUESSES = 7;
 
+const int MAX_BAD_GUESSES = 7;
+string str("");
 
 int main()
 {
@@ -98,7 +27,10 @@ int main()
         if (contains(guess, secretWord)) {
             update(secretWord, guess, guessedWord);
         }
-        else badGuessCount++;
+        else {
+                badGuessCount++;
+                str = str + guess + " ";
+        }
     } while (badGuessCount < MAX_BAD_GUESSES && guessedWord != secretWord);
 
     render(guessedWord, badGuessCount);
@@ -107,7 +39,7 @@ int main()
     return 0;
 }
 
-void update(string secretWord, char guess, string &guessedWord) {
+void update(const string& secretWord, char guess, string &guessedWord) {
     int size = secretWord.length();
     for (int i = 0; i < size; i++) {
         if (guess == secretWord[i]) {
@@ -116,7 +48,7 @@ void update(string secretWord, char guess, string &guessedWord) {
     }
 }
 
-bool contains(char guess, string secretWord) {
+bool contains(char guess, const string& secretWord) {
     return (secretWord.find(guess) != string::npos);
 }
 
@@ -124,13 +56,225 @@ char readAGuess() {
     char guess;
     cout << "Your guess: ";
     cin >> guess;
+    guess = tolower(guess);
     return guess;
 }
 
-void render(string guessedWord, int badGuessCount) {
+const string fig[] = {
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"   -------------  \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+" -----            \n",
+
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"   -------------  \n"
+"   |           |  \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+" -----            \n",
+
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"   -------------  \n"
+"   |           |  \n"
+"   |           0  \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+" -----            \n",
+
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"   -------------  \n"
+"   |           |  \n"
+"   |           0  \n"
+"   |           |  \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+" -----            \n",
+
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"   -------------  \n"
+"   |           |  \n"
+"   |           0  \n"
+"   |          /|  \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+" -----            \n",
+
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"   -------------  \n"
+"   |           |  \n"
+"   |           0  \n"
+"   |          /|\\ \n"
+"   |              \n"
+"   |              \n"
+"   |              \n"
+" -----            \n",
+
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"   -------------  \n"
+"   |           |  \n"
+"   |           0  \n"
+"   |          /|\\ \n"
+"   |          /   \n"
+"   |              \n"
+"   |              \n"
+" -----            \n",
+
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"                  \n"
+"   -------------  \n"
+"   |           |  \n"
+"   |           0  \n"
+"   |          /|\\ \n"
+"   |          / \\ \n"
+"   |              \n"
+"   |              \n"
+" -----            \n"
+};
+
+void render(string& guessedWord, int badGuessCount) {
     cout << fig[badGuessCount] << endl;
     cout << guessedWord << endl;
     cout << "Number of wrong guesses: " << badGuessCount << endl;
+    cout << "Wrong guessed words: " << str << endl;
 }
 
 const string WORD_LIST[] = {
