@@ -1,0 +1,69 @@
+# depslib dependency file v1.0
+1742677039 source:d:\game\hang-man\game.cpp
+	<iostream>
+	<cctype>
+	"game.h"
+
+1742678753 d:\game\hang-man\game.h
+	<string>
+
+1742675306 source:d:\game\hang-man\graphics.cpp
+	<iostream>
+	<fstream>
+	"graphics.h"
+
+1742678753 d:\game\hang-man\graphics.h
+	<string>
+	<vector>
+
+1742678500 source:d:\game\hang-man\main.cpp
+	<iostream>
+	<ctime>
+	"game.h"
+	"graphics.h"
+	"wordlist.h"
+
+1742678469 d:\game\hang-man\wordlist.h
+	<string>
+	<vector>
+
+1742677658 source:d:\game\hang-man\wordlist.cpp
+	<iostream>
+	<cstdlib>
+	<fstream>
+	"wordlist.h"
+
+1742677039 source:d:\game\hang man\game.cpp
+	<iostream>
+	<cctype>
+	"game.h"
+
+1742678753 d:\game\hang man\game.h
+	<string>
+
+1742675306 source:d:\game\hang man\graphics.cpp
+	<iostream>
+	<fstream>
+	"graphics.h"
+
+1742678753 d:\game\hang man\graphics.h
+	<string>
+	<vector>
+
+1742678500 source:d:\game\hang man\main.cpp
+	<iostream>
+	<ctime>
+	"game.h"
+	"graphics.h"
+	"wordlist.h"
+
+1742678469 d:\game\hang man\wordlist.h
+	<string>
+	<vector>
+
+1742677658 source:d:\game\hang man\wordlist.cpp
+	<iostream>
+	<cstdlib>
+	<fstream>
+	"wordlist.h"
+
