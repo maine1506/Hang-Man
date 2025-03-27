@@ -10,8 +10,8 @@ int main()
 {
     srand(time(0));
 
-    vector<string> frames = loadFrames("hangman_frames.txt");
-    vector<string> wordList = loadWords("word_list.txt");
+    vector<string> frames = loadFrames("assets/hangman_frames.txt");
+    vector<string> wordList = loadWords("assets/word_list.txt");
 
     string secretWord = chooseWord(wordList);
     int badGuessCount = 0;

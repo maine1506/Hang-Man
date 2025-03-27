@@ -1,6 +1,7 @@
 #include <iostream>
-#include <cstdlib>
+#include <cstdlib> //dung rand()
 #include <fstream>
+#include <algorithm> //dung transform
 #include "wordlist.h";
 
 using namespace std;
@@ -20,7 +21,16 @@ vector<string> loadWords(const string& filename) {
     return words;
 }
 
+string getLowerCaseString(const string& s) {
+    string res = s;
+    transform(s.begin(), s.end(), res.begin(), ::tolower);
+    return res;
+}
+
 string chooseWord(const vector<string>& wordList) {
-    int randomIndex = rand() % wordList.size();
-    return wordList[randomIndex];
+    if(wordList.size() > 0) {
+        int randomIndex = rand() % wordList.size();
+        return getLowerCaseString(wordList[randomIndex]);
+    }
+    else return "";
 }

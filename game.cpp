@@ -1,5 +1,5 @@
 #include <iostream>
-#include <cctype>
+#include <cctype> //dung tolower
 #include "game.h"
 
 using namespace std;
