@@ -7,16 +7,18 @@
 1743068803 d:\game\hang-man\game.h
 	<string>
 
-1743069085 source:d:\game\hang-man\graphics.cpp
+1743076802 source:d:\game\hang-man\graphics.cpp
 	<iostream>
 	<fstream>
 	"graphics.h"
+	<chrono>
+	<thread>
 
-1743069357 d:\game\hang-man\graphics.h
+1743076303 d:\game\hang-man\graphics.h
 	<string>
 	<vector>
 
-1743069085 source:d:\game\hang-man\main.cpp
+1743145623 source:d:\game\hang-man\main.cpp
 	<iostream>
 	<ctime>
 	"game.h"

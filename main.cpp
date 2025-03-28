@@ -10,7 +10,7 @@ int main()
 {
     srand(time(0));
 
-    vector<string> frames = loadFrames("assets/hangman_frames.txt");
+    vector<string> frames = getImage("assets/hangman_frames.txt");
     vector<string> wordList = loadWords("assets/word_list.txt");
 
     string secretWord = chooseWord(wordList);
@@ -31,11 +31,6 @@ int main()
         }
     } while (badGuessCount < MAX_BAD_GUESSES && guessedWord != secretWord);
 
-    render(guessedWord, badGuessCount, frames, wrongGuesses);
-    if (guessedWord == secretWord)
-        cout << "\nYOU WIN!!!\n";
-    else
-        cout << "\nYou lose. The answer is \"" << secretWord << "\".\n";
-
+    displayFinalResult(guessedWord == secretWord, secretWord);
     return 0;
 }
