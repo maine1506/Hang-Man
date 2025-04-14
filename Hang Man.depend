@@ -14,16 +14,23 @@
 	<chrono>
 	<thread>
 
-1743076303 d:\game\hang-man\graphics.h
-	<string>
-	<vector>
+1744614632 d:\game\hang-man\graphics.h
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_ttf.h>
+	"defs.h"
+	"logic.h"
 
-1743145623 source:d:\game\hang-man\main.cpp
+1744615554 source:d:\game\hang-man\main.cpp
 	<iostream>
 	<ctime>
-	"game.h"
+	<vector>
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_ttf.h>
 	"graphics.h"
-	"wordlist.h"
+	"logic.h"
+	"defs.h"
 
 1743068803 d:\game\hang-man\wordlist.h
 	<string>
@@ -80,4 +87,12 @@
 1743066563 d:\game\hang-man\include\wordlist.h
 	<string>
 	<vector>
+
+1744614632 d:\game\hang-man\defs.h
+
+1744614630 d:\game\hang-man\logic.h
+	<fstream>
+	<algorithm>
+	"defs.h"
+	"graphics.h"
 

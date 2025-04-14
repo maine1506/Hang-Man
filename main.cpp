@@ -1,36 +1,71 @@
 #include <iostream>
 #include <ctime>
-#include "game.h"
+#include <vector>
+
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
 #include "graphics.h"
-#include "wordlist.h"
+#include "logic.h"
+#include "defs.h"
 
 using namespace std;
 
-int main()
+vector<string> loadWords(const string& filename);
+vector<string> getImage(const string& filename);
+void waitUntilKeyPressed();
+void processPressAt(char guess, Hangman& game);
+
+int main(int argc, char *argv[])
 {
     srand(time(0));
 
-    vector<string> frames = getImage("assets/hangman_frames.txt");
-    vector<string> wordList = loadWords("assets/word_list.txt");
+    Graphics graphics;
+    graphics.init();
 
-    string secretWord = chooseWord(wordList);
-    int badGuessCount = 0;
-    string guessedWord = string(secretWord.length(), '-');
-    string wrongGuesses = "";
+    Hangman game;
+    game.init();
 
-    do {
-        render(guessedWord, badGuessCount, frames, wrongGuesses);
-        char guess = readAGuess();
-        cout << endl;
-        if (contains(guess, secretWord)) {
-            update(secretWord, guess, guessedWord);
-        } else {
-            badGuessCount++;
-            wrongGuesses += guess;
-            wrongGuesses += " ";
+    graphics.render(game);
+
+    bool quit = false;
+    SDL_Event event;
+    while (!quit && !game.endGame()) {
+        SDL_PollEvent(&event);
+        switch (event.type) {
+        case SDL_QUIT:
+            quit = true;
+            break;
+        case SDL_KEYDOWN:
+            SDL_Keycode keyPressed = event.key.keysym.sym;
+
+            if (keyPressed >= SDLK_a && keyPressed <= SDLK_z) {
+                char guess = (char)keyPressed;
+                processPressAt(guess, game);
+
+                graphics.render(game);
+                break;
+            }
         }
-    } while (badGuessCount < MAX_BAD_GUESSES && guessedWord != secretWord);
+        SDL_Delay(100);
+    }
 
-    displayFinalResult(guessedWord == secretWord, secretWord);
+    graphics.quit();
     return 0;
+}
+
+void waitUntilKeyPressed()
+{
+    SDL_Event e;
+    while (true) {
+        if ( SDL_PollEvent(&e) != 0 &&
+             (e.type == SDL_KEYDOWN || e.type == SDL_QUIT) )
+            return;
+        SDL_Delay(100);
+    }
+}
+
+void processPressAt(char guess, Hangman& game) {
+    game.guess = guess;
+    game.nextImage(guess);
 }
