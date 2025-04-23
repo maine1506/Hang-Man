@@ -12,35 +12,34 @@
 
 using namespace std;
 
-struct Keyboard {
+struct LetterButton {
     char letter;
     SDL_Rect rect;
-    bool clicked;
-    bool correct;
-    vector<Keyboard> keyboard;
-    vector<string> rows = {
+    bool clicked = false;
+    bool correct = false;
+};
+
+struct Keyboard {
+    vector<LetterButton> keys;
+
+    void init() {
+        vector<string> rows = {
             "QWERTYUIOP",
             "ASDFGHJKL",
             "ZXCVBNM"
         };
-
-    void init() {
         for (int row = 0; row < rows.size(); ++row) {
             int x = startX + row * 25;
             int y = startY + row * (buttonH + spacing);
 
             for (int i = 0; i < rows[row].size(); ++i) {
-                Keyboard btn;
+                LetterButton btn;
                 btn.letter = rows[row][i];
                 btn.rect = { x + i * (buttonW + spacing), y, buttonW, buttonH };
-                btn.clicked = false;
-                btn.correct = false;
-                keyboard.push_back(btn);
+                keys.push_back(btn);
             }
         }
     }
 
 };
-#endif // _KEYBOARD__H
-
-
+#endif // _KEYBOARD__H

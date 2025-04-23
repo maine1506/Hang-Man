@@ -14,7 +14,7 @@
 	<chrono>
 	<thread>
 
-1745440382 d:\game\hang-man\graphics.h
+1745446483 d:\game\hang-man\graphics.h
 	<SDL.h>
 	<SDL_image.h>
 	<SDL_ttf.h>
@@ -22,7 +22,7 @@
 	"keyboard.h"
 	"logic.h"
 
-1745440325 source:d:\game\hang-man\main.cpp
+1745445770 source:d:\game\hang-man\main.cpp
 	<iostream>
 	<ctime>
 	<vector>
@@ -89,14 +89,14 @@
 	<string>
 	<vector>
 
-1745229480 d:\game\hang-man\defs.h
+1745441240 d:\game\hang-man\defs.h
 
-1745440281 d:\game\hang-man\logic.h
+1745445958 d:\game\hang-man\logic.h
 	<fstream>
 	<algorithm>
 	<ctime>
 	"defs.h"
 
-1745440273 d:\game\hang-man\keyboard.h
+1745442766 d:\game\hang-man\keyboard.h
 	<vector>
 

@@ -10,44 +10,40 @@
 using namespace std;
 
 struct Hangman {
-    vector<string> wordList = loadWords("assets/word_list.txt");
-
-    char guess;
+    vector<string> wordList;
     string secretWord;
-    string nextFrame;
     string guessedWord;
     string wrongGuesses;
     int badGuessCount;
 
-
     void init() {
         srand(time(0));
-        badGuessCount = 0;
+        wordList = loadWords("assets/word_list.txt");
         secretWord = chooseWord(wordList);
         guessedWord = string(secretWord.size(), '_');
-        wrongGuesses = "";
+        badGuessCount = 0;
+        wrongGuesses.clear();
     }
 
-    void nextImage(Keyboard& btn) {
-        if (contains(btn.letter, secretWord)) {
-            btn.correct = true;
-            update(secretWord, btn.letter, guessedWord);
-
-        } else {
-            btn.correct = false;
-            badGuessCount++;
-        }
-    }
-
-    bool contains(char guess, const string& secretWord) {
+    bool contains(char guess) {
         return (secretWord.find(guess) != string::npos);
     }
 
-    void update(const string& secretWord, char guess, string &guessedWord) {
+    void update(char guess) {
         for (size_t i = 0; i < secretWord.length(); i++) {
             if (secretWord[i] == guess) {
                 guessedWord[i] = guess;
             }
+        }
+    }
+
+    void nextImage(LetterButton& btn) {
+        if (contains(btn.letter)) {
+            btn.correct = true;
+            update(btn.letter);
+        } else {
+            btn.correct = false;
+            badGuessCount++;
         }
     }
 
@@ -80,7 +76,7 @@ struct Hangman {
         return res;
     }
 
-    bool endGame() {
+    bool gameOver() {
         return (guessedWord == secretWord || badGuessCount == MAX_BAD_GUESSES);
     }
 };

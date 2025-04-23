@@ -15,38 +15,20 @@ struct Graphics {
     SDL_Renderer *renderer;
     SDL_Window *window;
     SDL_Texture* background, *correct, *wrong;
-    SDL_Texture* stage[MAX_BAD_GUESSES];
-    //vector<SDL_Texture*> stage;
-
-    char* allStage[MAX_BAD_GUESSES] = {"assets/st0.png", "assets/st1.png", "assets/st2.png", "assets/st3.png",
-                            "assets/st4.png", "assets/st5.png", "assets/st6.png"};
-
-
-
-    SDL_Texture *_nextFrame, *_guessedWord, *Wordsdonotexist, *Wrongtimes, *Yourguess;
-    TTF_Font* font = nullptr;
-    SDL_Color blue = {140, 187, 219, 0};
-    SDL_Color black = {0, 0, 0, 0};
-
-/*    void loadImages(SDL_Renderer* renderer) {
-        for (int i = 0; i < MAX_BAD_GUESSES; ++i) {
-            string path = "assets/st" + to_string(i) + ".png";
-            SDL_Surface* surface = IMG_Load(path.c_str());
-            SDL_Texture* tex = loadTexture(path.c_str());
-            SDL_FreeSurface(surface);
-            stage.push_back(tex);
-        }
-    }*/
-
+    vector<SDL_Texture*> stage;
 
     void init() {
         initSDL();
+        loadTextures();
+    }
+
+    void loadTextures() {
         background = loadTexture("assets/background.png");
         correct = loadTexture("assets/correct.png");
         wrong = loadTexture("assets/wrong.png");
-
-        for (int i = 0; i < MAX_BAD_GUESSES; i++) {
-            stage[i] = loadTexture(allStage[i]);
+        for (int i = 0; i < MAX_BAD_GUESSES; ++i) {
+            string path = "assets/st" + to_string(i) + ".png";
+            stage.push_back(loadTexture(path.c_str()));
         }
     }
 
@@ -60,8 +42,9 @@ struct Graphics {
             spaced += c;
             spaced += ' ';
         }
-        SDL_Texture* _guessedWord = renderText(spaced.c_str(), "assets/sarifa.ttf", 26, black);
-        renderTextureMid(_guessedWord, 170, 150);
+        SDL_Color black = {0, 0, 0, 0};
+        SDL_Texture* guessedWord = renderText(spaced.c_str(), "assets/sarifa.ttf", 26, black);
+        renderTextureMid(guessedWord, 170, 150);
 
         renderKeyboard(keyboard);
 
@@ -69,15 +52,9 @@ struct Graphics {
     }
 
     void renderKeyboard(const Keyboard& keyboard) {
-
-        font = loadFont("assets/sarifa.ttf", 26);
-        for (const auto& btn : keyboard.keyboard) {
-            // Vẽ khung
-            /*SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // viền đen
-            SDL_RenderDrawRect(renderer, &btn.rect);*/
-
-            SDL_Surface* surface = TTF_RenderText_Blended(font, string(1, btn.letter).c_str(), blue);
-            SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_Color blue = {140, 187, 219, 0};
+        for (const auto& btn : keyboard.keys) {
+            SDL_Texture* texture = renderText(string(1, btn.letter).c_str(), "assets/sarifa.ttf", 26, blue);
 
             int textW, textH;
             SDL_QueryTexture(texture, NULL, NULL, &textW, &textH);
@@ -88,10 +65,8 @@ struct Graphics {
             };
             SDL_RenderCopy(renderer, texture, NULL, &textRect);
 
-            SDL_FreeSurface(surface);
             SDL_DestroyTexture(texture);
 
-            // Đánh dấu nếu đã chọn
             if (btn.clicked) {
                 SDL_Rect iconRect = {
                     btn.rect.x + (btn.rect.w - 26) / 2,
@@ -108,8 +83,7 @@ struct Graphics {
         }
     }
 
-    void logErrorAndExit(const char* msg, const char* error)
-    {
+    void logErrorAndExit(const char* msg, const char* error) {
         SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR,
                        "%s: %s", msg, error);
         SDL_Quit();
@@ -146,8 +120,7 @@ struct Graphics {
         }
     }
 
-    void prepareScene(SDL_Texture * background)
-    {
+    void prepareScene(SDL_Texture * background) {
         SDL_RenderClear(renderer);
         SDL_RenderCopy( renderer, background, NULL, NULL);
     }
@@ -156,8 +129,7 @@ struct Graphics {
         SDL_RenderPresent(renderer);
     }
 
-    TTF_Font* loadFont(const char* path, int size)
-    {
+    TTF_Font* loadFont(const char* path, int size) {
         TTF_Font* gFont = TTF_OpenFont( path, size );
         if (gFont == nullptr) {
             SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION,
@@ -171,7 +143,7 @@ struct Graphics {
     SDL_Texture* renderText(const char* text, const char* path,
                             int size, SDL_Color textColor)
     {
-        font = loadFont(path, size);
+        TTF_Font* font = loadFont(path, size);
 
         SDL_Surface* textSurface =
                 TTF_RenderText_Blended(font, text, textColor);
@@ -197,8 +169,7 @@ struct Graphics {
         return texture;
     }
 
-    SDL_Texture *loadTexture(const char *filename)
-    {
+    SDL_Texture *loadTexture(const char *filename) {
         SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO,
                        "Loading %s", filename);
         SDL_Texture *texture = IMG_LoadTexture(renderer, filename);
@@ -209,8 +180,7 @@ struct Graphics {
         return texture;
     }
 
-    void renderTexture(SDL_Texture *texture, int x, int y)
-    {
+    void renderTexture(SDL_Texture *texture, int x, int y) {
         SDL_Rect dest;
 
         dest.x = x;
@@ -221,7 +191,7 @@ struct Graphics {
 
     }
 
-        void renderTextureMid(SDL_Texture *texture, int x, int y) {
+    void renderTextureMid(SDL_Texture *texture, int x, int y) {
         SDL_Rect dest;
 
         SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
@@ -235,12 +205,10 @@ struct Graphics {
     void quit() {
         TTF_Quit();
         IMG_Quit();
-
         for (auto tex : stage) SDL_DestroyTexture(tex);
         SDL_DestroyTexture(background);
         SDL_DestroyTexture(correct);
         SDL_DestroyTexture(wrong);
-
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
@@ -249,4 +217,3 @@ struct Graphics {
 };
 
 #endif // _GRAPHICS__H
-

@@ -11,8 +11,20 @@
 
 using namespace std;
 
-void waitUntilKeyPressed();
-void processClick(int mouseX, int mouseY, Keyboard& keyboard, Hangman& game);
+void processClick(int mouseX, int mouseY, Keyboard& keyboard, Hangman& game) {
+    for (auto& btn : keyboard.keys) {
+        if (!btn.clicked &&
+            mouseX >= btn.rect.x && mouseX <= btn.rect.x + btn.rect.w &&
+            mouseY >= btn.rect.y && mouseY <= btn.rect.y + btn.rect.h) {
+
+            btn.clicked = true;
+
+            game.nextImage(btn);
+
+            break;
+        }
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -26,54 +38,28 @@ int main(int argc, char *argv[])
     game.init();
 
     graphics.render(game, keyboard);
-    //graphics.renderKeyboard(keyboard);
 
-    int x, y;
     bool quit = false;
     SDL_Event event;
-    while (!quit && !game.endGame()) {
+    while (!quit && !game.gameOver()) {
         SDL_PollEvent(&event);
         switch (event.type) {
         case SDL_QUIT:
             quit = true;
             break;
         case SDL_MOUSEBUTTONDOWN:
-             SDL_GetMouseState(&x, &y);
-             processClick(x, y, keyboard, game);
-             graphics.render(game, keyboard);
-             graphics.renderKeyboard(keyboard);
-             break;
+            int x, y;
+            SDL_GetMouseState(&x, &y);
+            processClick(x, y, keyboard, game);
+            graphics.render(game, keyboard);
+            break;
         }
-        SDL_Delay(100);
+        SDL_Delay(30);
     }
 
     graphics.quit();
     return 0;
 }
 
-void waitUntilKeyPressed()
-{
-    SDL_Event e;
-    while (true) {
-        if ( SDL_PollEvent(&e) != 0 &&
-             (e.type == SDL_KEYDOWN || e.type == SDL_QUIT) )
-            return;
-        SDL_Delay(100);
-    }
-}
 
-void processClick(int mouseX, int mouseY, Keyboard& keyboard, Hangman& game) {
-    for (auto& btn : keyboard.keyboard) {
-        if (!btn.clicked &&
-            mouseX >= btn.rect.x && mouseX <= btn.rect.x + btn.rect.w &&
-            mouseY >= btn.rect.y && mouseY <= btn.rect.y + btn.rect.h) {
-
-            btn.clicked = true;
-
-            game.nextImage(btn);
-
-            break;
-        }
-    }
-}
 

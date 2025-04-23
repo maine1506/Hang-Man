@@ -8,3 +8,4 @@ const char* WINDOW_TITLE = "Hang Man";
 
 #endif
 
+
