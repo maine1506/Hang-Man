@@ -11,23 +11,24 @@
 
 using namespace std;
 
-vector<string> loadWords(const string& filename);
-vector<string> getImage(const string& filename);
 void waitUntilKeyPressed();
-void processPressAt(char guess, Hangman& game);
+void processClick(int mouseX, int mouseY, Keyboard& keyboard, Hangman& game);
 
 int main(int argc, char *argv[])
 {
-    srand(time(0));
-
     Graphics graphics;
     graphics.init();
+
+    Keyboard keyboard;
+    keyboard.init();
 
     Hangman game;
     game.init();
 
-    graphics.render(game);
+    graphics.render(game, keyboard);
+    //graphics.renderKeyboard(keyboard);
 
+    int x, y;
     bool quit = false;
     SDL_Event event;
     while (!quit && !game.endGame()) {
@@ -36,16 +37,12 @@ int main(int argc, char *argv[])
         case SDL_QUIT:
             quit = true;
             break;
-        case SDL_KEYDOWN:
-            SDL_Keycode keyPressed = event.key.keysym.sym;
-
-            if (keyPressed >= SDLK_a && keyPressed <= SDLK_z) {
-                char guess = (char)keyPressed;
-                processPressAt(guess, game);
-
-                graphics.render(game);
-                break;
-            }
+        case SDL_MOUSEBUTTONDOWN:
+             SDL_GetMouseState(&x, &y);
+             processClick(x, y, keyboard, game);
+             graphics.render(game, keyboard);
+             graphics.renderKeyboard(keyboard);
+             break;
         }
         SDL_Delay(100);
     }
@@ -65,7 +62,18 @@ void waitUntilKeyPressed()
     }
 }
 
-void processPressAt(char guess, Hangman& game) {
-    game.guess = guess;
-    game.nextImage(guess);
+void processClick(int mouseX, int mouseY, Keyboard& keyboard, Hangman& game) {
+    for (auto& btn : keyboard.keyboard) {
+        if (!btn.clicked &&
+            mouseX >= btn.rect.x && mouseX <= btn.rect.x + btn.rect.w &&
+            mouseY >= btn.rect.y && mouseY <= btn.rect.y + btn.rect.h) {
+
+            btn.clicked = true;
+
+            game.nextImage(btn);
+
+            break;
+        }
+    }
 }
+

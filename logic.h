@@ -1,41 +1,41 @@
-#ifndef _HANGMAN__H
-#define _HANGMAN__H
+#ifndef _LOGIC__H
+#define _LOGIC__H
 
 #include <fstream>
 #include <algorithm>
+#include <ctime>
 
 #include "defs.h"
-#include "graphics.h"
 
 using namespace std;
 
 struct Hangman {
     vector<string> wordList = loadWords("assets/word_list.txt");
-    vector<string> frames = getImage("assets/hangman_frames.txt");
+
     char guess;
-    string secretWord = chooseWord(wordList);
+    string secretWord;
     string nextFrame;
-    string guessedWord = string(secretWord.size(), '-');
-    string wrongGuesses = "";
-    int badGuessCount = 0;
+    string guessedWord;
+    string wrongGuesses;
+    int badGuessCount;
 
 
     void init() {
         srand(time(0));
         badGuessCount = 0;
         secretWord = chooseWord(wordList);
-        guessedWord = string(secretWord.size(), '-');
+        guessedWord = string(secretWord.size(), '_');
         wrongGuesses = "";
-        nextFrame = frames[badGuessCount];
     }
 
-    void nextImage(char guess) {
-        if (contains(guess, secretWord)) {
-            update(secretWord, guess, guessedWord);
+    void nextImage(Keyboard& btn) {
+        if (contains(btn.letter, secretWord)) {
+            btn.correct = true;
+            update(secretWord, btn.letter, guessedWord);
+
         } else {
+            btn.correct = false;
             badGuessCount++;
-            wrongGuesses = wrongGuesses + guess + " ";
-            nextFrame = frames[badGuessCount];
         }
     }
 
@@ -51,59 +51,32 @@ struct Hangman {
         }
     }
 
-    char readAGuess() {
-        char guess;
-        cin >> guess;
-        return tolower(guess);
-    }
-
     string chooseWord(const vector<string>& wordList) {
         if(wordList.size() > 0) {
             int randomIndex = rand() % wordList.size();
-            return getLowerCaseString(wordList[randomIndex]);
+            return getUpperCaseString(wordList[randomIndex]);
         }
         else return "";
     }
 
     vector<string> loadWords(const string& filename) {
-    vector<string> words;
-    ifstream file(filename);
-    if (!file) {
-        cerr << "Can't open file " << filename << "!\n";
-        exit(1);
-    }
-    string word;
-    while (file >> word) {
-        words.push_back(word);
-    }
-    file.close();
-    return words;
-}
-
-vector<string> getImage(const string& filename) {
-    vector<string> Image;
-    ifstream file(filename);
-    if (!file) {
-        cerr << "Không thể mở file " << filename << "!\n";
-        exit(1);
-    }
-    string line, frame;
-    while (getline(file, line)) {
-        if (line.empty()) {
-            Image.push_back(frame);
-            frame.clear();
-        } else {
-            frame += line + "\n";
+        vector<string> words;
+        ifstream file(filename);
+        if (!file) {
+            cerr << "Can't open file " << filename << "!\n";
+            exit(1);
         }
+        string word;
+        while (file >> word) {
+            words.push_back(word);
+        }
+        file.close();
+        return words;
     }
-    if (!frame.empty()) Image.push_back(frame);
-    file.close();
-    return Image;
-}
 
-    string getLowerCaseString(const string& s) {
+    string getUpperCaseString(const string& s) {
         string res = s;
-        transform(s.begin(), s.end(), res.begin(), ::tolower);
+        transform(s.begin(), s.end(), res.begin(), ::toupper);
         return res;
     }
 
@@ -112,4 +85,5 @@ vector<string> getImage(const string& filename) {
     }
 };
 
-#endif // _HANGMAN__H
+
+#endif
