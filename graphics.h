@@ -14,8 +14,12 @@ using namespace std;
 struct Graphics {
     SDL_Renderer *renderer;
     SDL_Window *window;
-    SDL_Texture* background, *correct, *wrong;
+    SDL_Texture* background, *correct, *wrong, *playAgain, *playNext;
     vector<SDL_Texture*> stage;
+    vector<SDL_Texture*> lose;
+    vector<SDL_Texture*> win;
+    SDL_Color black = {0, 0, 0, 0};
+    SDL_Color blue = {58,135,190, 0};
 
     void init() {
         initSDL();
@@ -26,10 +30,60 @@ struct Graphics {
         background = loadTexture("assets/background.png");
         correct = loadTexture("assets/correct.png");
         wrong = loadTexture("assets/wrong.png");
+        playAgain = loadTexture("assets/playagain.png");
+        playNext = loadTexture("assets/playnext.png");
         for (int i = 0; i < MAX_BAD_GUESSES; ++i) {
             string path = "assets/st" + to_string(i) + ".png";
             stage.push_back(loadTexture(path.c_str()));
         }
+        lose.push_back(loadTexture("assets/cry0.png"));
+        lose.push_back(loadTexture("assets/cry1.png"));
+        win.push_back(loadTexture("assets/yeah0.png"));
+        win.push_back(loadTexture("assets/yeah1.png"));
+    }
+
+    SDL_Rect clickButtonRect(SDL_Texture *texture) {
+        SDL_Rect rect;
+        SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
+        rect.x = 130;
+        rect.y = 220;
+        return rect;
+    }
+
+    void drawTextBox(const string& text, int centerX, int centerY, SDL_Color textColor, SDL_Color borderColor) {
+        int thickness = 2;
+        SDL_Texture* texture = renderText(text.c_str(), "assets/sarifa.ttf", 19, textColor);
+
+        int textW, textH;
+        SDL_QueryTexture(texture, NULL, NULL, &textW, &textH);
+
+        int paddingX = 20;
+        int paddingY = 4;
+        SDL_Rect boxRect = {
+            centerX - (textW + paddingX * 2) / 2,
+            centerY - (textH + paddingY * 2) / 2,
+            textW + paddingX * 2,
+            textH + paddingY * 2
+        };
+
+        SDL_SetRenderDrawColor(renderer, borderColor.r, borderColor.g, borderColor.b, borderColor.a);
+        for (int i = 0; i < thickness; i++) {
+            SDL_RenderDrawRect(renderer, &boxRect);
+            boxRect.x += 1;
+            boxRect.y += 1;
+            boxRect.w -= 2;
+            boxRect.h -= 2;
+        }
+
+        SDL_Rect textRect = {
+            boxRect.x + paddingX - thickness,
+            boxRect.y + paddingY - thickness,
+            textW,
+            textH
+        };
+        SDL_RenderCopy(renderer, texture, NULL, &textRect);
+
+        SDL_DestroyTexture(texture);
     }
 
     void render(const Hangman& game, Keyboard& keyboard) {
@@ -42,8 +96,11 @@ struct Graphics {
             spaced += c;
             spaced += ' ';
         }
-        SDL_Color black = {0, 0, 0, 0};
+
         SDL_Texture* guessedWord = renderText(spaced.c_str(), "assets/sarifa.ttf", 26, black);
+
+        drawTextBox(game.currentEntry.category, 170, 100, blue, black);
+
         renderTextureMid(guessedWord, 170, 150);
 
         renderKeyboard(keyboard);
@@ -51,8 +108,36 @@ struct Graphics {
         presentScene();
     }
 
+    void renderFinalDisplay(const Hangman& game, int& i) {
+        prepareScene(background);
+
+        string spaced = "";
+        for (char c : game.secretWord) {
+            spaced += c;
+            spaced += ' ';
+        }
+        SDL_Texture* guessedWord = renderText(spaced.c_str(), "assets/sarifa.ttf", 26, black);
+        SDL_Texture* msg;
+
+        if (game.lost()) {
+            renderTexture(lose[i % lose.size()], 0, 0);
+            i++;
+            msg = renderText("You lost!", "assets/sarifa.ttf", 20, black);
+            renderTexture(playAgain, 130, 220);
+        } else if (game.won()) {
+            renderTexture(win[0], 0, 0);
+            i++;
+            msg = renderText("You won!", "assets/sarifa.ttf", 20, black);
+            renderTexture(playNext, 130, 220);
+        }
+
+        drawTextBox(game.currentEntry.category, 170, 100, blue, black);
+        renderTextureMid(guessedWord, 170, 150);
+        renderTextureMid(msg, 170, 190);
+        presentScene();
+    }
+
     void renderKeyboard(const Keyboard& keyboard) {
-        SDL_Color blue = {140, 187, 219, 0};
         for (const auto& btn : keyboard.keys) {
             SDL_Texture* texture = renderText(string(1, btn.letter).c_str(), "assets/sarifa.ttf", 26, blue);
 
@@ -188,7 +273,6 @@ struct Graphics {
         SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
 
         SDL_RenderCopy(renderer, texture, NULL, &dest);
-
     }
 
     void renderTextureMid(SDL_Texture *texture, int x, int y) {
@@ -201,6 +285,7 @@ struct Graphics {
 
         SDL_RenderCopy(renderer, texture, NULL, &dest);
     }
+
 
     void quit() {
         TTF_Quit();

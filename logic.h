@@ -6,11 +6,19 @@
 #include <ctime>
 
 #include "defs.h"
+#include "graphics.h"
+#include "keyboard.h"
 
 using namespace std;
 
+struct WordEntry {
+    string word;
+    string category;
+};
+
 struct Hangman {
-    vector<string> wordList;
+    vector<WordEntry> wordList;
+    WordEntry currentEntry;
     string secretWord;
     string guessedWord;
     string wrongGuesses;
@@ -19,7 +27,8 @@ struct Hangman {
     void init() {
         srand(time(0));
         wordList = loadWords("assets/word_list.txt");
-        secretWord = chooseWord(wordList);
+        currentEntry = chooseWord(wordList);
+        secretWord = getUpperCaseString(currentEntry.word);
         guessedWord = string(secretWord.size(), '_');
         badGuessCount = 0;
         wrongGuesses.clear();
@@ -42,29 +51,29 @@ struct Hangman {
             btn.correct = true;
             update(btn.letter);
         } else {
-            btn.correct = false;
+            //btn.correct = false;
             badGuessCount++;
         }
     }
 
-    string chooseWord(const vector<string>& wordList) {
+    WordEntry chooseWord(const vector<WordEntry>& wordList) {
         if(wordList.size() > 0) {
             int randomIndex = rand() % wordList.size();
-            return getUpperCaseString(wordList[randomIndex]);
+            return wordList[randomIndex];
         }
-        else return "";
+        else return {"", ""};
     }
 
-    vector<string> loadWords(const string& filename) {
-        vector<string> words;
+    vector<WordEntry> loadWords(const string& filename) {
+        vector<WordEntry> words;
         ifstream file(filename);
         if (!file) {
             cerr << "Can't open file " << filename << "!\n";
             exit(1);
         }
-        string word;
-        while (file >> word) {
-            words.push_back(word);
+        string word, category;
+        while (file >> word >> category) {
+            words.push_back({word, category});
         }
         file.close();
         return words;
@@ -77,9 +86,18 @@ struct Hangman {
     }
 
     bool gameOver() {
-        return (guessedWord == secretWord || badGuessCount == MAX_BAD_GUESSES);
+        return (won() || lost());
+    }
+
+    bool won() const {
+        return (guessedWord == secretWord && badGuessCount < MAX_BAD_GUESSES);
+    }
+
+    bool lost() const {
+        return (badGuessCount >= MAX_BAD_GUESSES);
     }
 };
+
 
 
 #endif

@@ -11,16 +11,16 @@
 
 using namespace std;
 
+bool checkButtonClick(int mouseX, int mouseY, SDL_Rect buttonRect) {
+    return (mouseX >= buttonRect.x && mouseX <= buttonRect.x + buttonRect.w &&
+            mouseY >= buttonRect.y && mouseY <= buttonRect.y + buttonRect.h);
+}
+
 void processClick(int mouseX, int mouseY, Keyboard& keyboard, Hangman& game) {
     for (auto& btn : keyboard.keys) {
-        if (!btn.clicked &&
-            mouseX >= btn.rect.x && mouseX <= btn.rect.x + btn.rect.w &&
-            mouseY >= btn.rect.y && mouseY <= btn.rect.y + btn.rect.h) {
-
+        if (!btn.clicked && checkButtonClick(mouseX, mouseY, btn.rect)) {
             btn.clicked = true;
-
             game.nextImage(btn);
-
             break;
         }
     }
@@ -39,9 +39,12 @@ int main(int argc, char *argv[])
 
     graphics.render(game, keyboard);
 
+    int i = 0;
     bool quit = false;
+    bool clickButton = false;
     SDL_Event event;
-    while (!quit && !game.gameOver()) {
+
+    while (!quit) {
         SDL_PollEvent(&event);
         switch (event.type) {
         case SDL_QUIT:
@@ -51,10 +54,38 @@ int main(int argc, char *argv[])
             int x, y;
             SDL_GetMouseState(&x, &y);
             processClick(x, y, keyboard, game);
-            graphics.render(game, keyboard);
+
+            if (game.gameOver()) {
+                if (game.lost()
+                    && checkButtonClick(x, y, graphics.clickButtonRect(graphics.playAgain))
+                    && clickButton) {
+                    game.init();
+                    keyboard.reset();
+                    graphics.render(game, keyboard);
+                    i = 0;
+                    clickButton = false;
+                }
+                else if (game.won()
+                         && checkButtonClick(x, y, graphics.clickButtonRect(graphics.playNext))
+                         && clickButton) {
+                    game.init();
+                    keyboard.reset();
+                    graphics.render(game, keyboard);
+                    i = 0;
+                    clickButton = false;
+                }
+            } else {
+                graphics.render(game, keyboard);
+            }
             break;
+        default:
+            if (game.gameOver()) {
+                graphics.renderFinalDisplay(game, i);
+                clickButton = true;
+                SDL_Delay(140);
+            }
         }
-        SDL_Delay(30);
+        if (!game.gameOver()) SDL_Delay(50);
     }
 
     graphics.quit();

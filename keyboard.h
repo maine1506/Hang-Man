@@ -40,6 +40,13 @@ struct Keyboard {
             }
         }
     }
+    void reset() {
+        for (auto& btn : keys) {
+            btn.clicked = false;
+            btn.correct = false;
+        }
+    }
 
 };
+
 #endif // _KEYBOARD__H
