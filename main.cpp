@@ -11,6 +11,13 @@
 
 using namespace std;
 
+enum GameState {
+    HOME,
+    PLAYING,
+    WIN,
+    LOSE
+};
+
 bool checkButtonClick(int mouseX, int mouseY, SDL_Rect buttonRect) {
     return (mouseX >= buttonRect.x && mouseX <= buttonRect.x + buttonRect.w &&
             mouseY >= buttonRect.y && mouseY <= buttonRect.y + buttonRect.h);
@@ -35,15 +42,13 @@ int main(int argc, char *argv[])
     keyboard.init();
 
     Hangman game;
-    game.init();
 
-    graphics.render(game, keyboard);
+    GameState gameState = HOME;
 
     int i = 0;
+    bool flag = false;
     bool quit = false;
     SDL_Event event;
-    SDL_Rect playAgain = graphics.clickButtonRect(graphics.playAgain);
-    SDL_Rect playNext = graphics.clickButtonRect(graphics.playNext);
 
     while (!quit) {
         SDL_PollEvent(&event);
@@ -55,33 +60,65 @@ int main(int argc, char *argv[])
             int x, y;
             SDL_GetMouseState(&x, &y);
 
-            if (game.gameOver()) {
-                if (game.lost()
-                && checkButtonClick(x, y, playAgain)) {
+            if (gameState == HOME) {
+                if (checkButtonClick(x, y, graphics.playButton)) {
                     game.init();
                     keyboard.reset();
+                    gameState = PLAYING;
                     graphics.render(game, keyboard);
-                    i = 0;
                 }
-                else if (game.won()
-                && checkButtonClick(x, y, playNext)) {
-                    game.init();
-                    keyboard.reset();
-                    graphics.render(game, keyboard);
-                    i = 0;
+            }
+            else if (gameState == PLAYING) {
+                flag = false;
+                if (checkButtonClick(x, y, graphics.hintButton)) {
+                    game.showHint(keyboard);
                 }
-            } else {
                 processClick(x, y, keyboard, game);
-                if (!game.gameOver()) graphics.render(game, keyboard);
+                if (!game.gameOver()) {
+                    graphics.render(game, keyboard);
+                } else {
+                    gameState = (game.won() ? WIN : LOSE);
+                }
+            }
+            else if (gameState == WIN) {
+                if (checkButtonClick(x, y, graphics.playNextButton)) {
+                    game.level++;
+                    game.init();
+                    keyboard.reset();
+                    gameState = PLAYING;
+                    graphics.render(game, keyboard);
+                }
+            }
+            else if (gameState == LOSE) {
+                if (checkButtonClick(x, y, graphics.playAgainButton)) {
+                    game.level = 1;
+                    game.init();
+                    keyboard.reset();
+                    gameState = PLAYING;
+                    graphics.render(game, keyboard);
+                }
+                else if (checkButtonClick(x, y, graphics.homeButton)) {
+                    gameState = HOME;
+                }
             }
             break;
-        default:
-            if (game.gameOver()) {
-                graphics.renderFinalDisplay(game, i);
-                SDL_Delay(140);
-            }
         }
-        if (!game.gameOver()) SDL_Delay(50);
+
+        if (gameState == HOME) {
+            graphics.renderHomeScreen();
+        }
+        else if (gameState == WIN || gameState == LOSE) {
+            if (gameState == WIN && !flag) {
+                game.score += 5;
+                flag = true;
+            }
+            graphics.renderFinalDisplay(game, i);
+            SDL_Delay(140);
+        }
+
+        if (gameState == PLAYING && !game.gameOver()) {
+            SDL_Delay(50);
+        }
     }
 
     graphics.quit();

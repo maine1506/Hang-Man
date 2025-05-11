@@ -23,6 +23,8 @@ struct Hangman {
     string guessedWord;
     string wrongGuesses;
     int badGuessCount;
+    int score = 0;
+    int level = 1;
 
     void init() {
         srand(time(0));
@@ -51,7 +53,6 @@ struct Hangman {
             btn.correct = true;
             update(btn.letter);
         } else {
-            btn.correct = false;
             badGuessCount++;
         }
     }
@@ -96,6 +97,31 @@ struct Hangman {
     bool lost() const {
         return (badGuessCount >= MAX_BAD_GUESSES);
     }
+
+    void showHint(Keyboard& keyboard) {
+        if (score < 10) return;
+
+        vector<char> missing;
+        for (int i = 0; i < secretWord.length(); ++i) {
+            if (guessedWord[i] == '_') {
+                missing.push_back(secretWord[i]);
+            }
+        }
+
+        if (missing.empty()) return;
+
+        char chosen = missing[rand() % missing.size()];
+
+        for (auto& btn : keyboard.keys) {
+            if (btn.letter == chosen && !btn.clicked) {
+                btn.clicked = true;
+                nextImage(btn);
+                score -= 10;
+                break;
+            }
+        }
+    }
+
 };
 
 

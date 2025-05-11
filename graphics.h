@@ -14,12 +14,18 @@ using namespace std;
 struct Graphics {
     SDL_Renderer *renderer;
     SDL_Window *window;
-    SDL_Texture* background, *correct, *wrong, *playAgain, *playNext;
+    SDL_Texture* background, *correct, *wrong, * play, *playAgain, *playNext,
+               *home, *diamond, *hint;
     vector<SDL_Texture*> stage;
     vector<SDL_Texture*> lose;
     vector<SDL_Texture*> win;
     SDL_Color black = {0, 0, 0, 0};
-    SDL_Color blue = {58,135,190, 0};
+    SDL_Color blue = {58, 135, 190, 0};
+    SDL_Color green = {55, 220, 148, 0};
+    SDL_Color red = {255, 0, 0, 0};
+    SDL_Rect dest;
+    SDL_Rect playAgainButton, playNextButton,
+             playButton, homeButton, hintButton;
 
     void init() {
         initSDL();
@@ -32,6 +38,10 @@ struct Graphics {
         wrong = loadTexture("assets/wrong.png");
         playAgain = loadTexture("assets/playagain.png");
         playNext = loadTexture("assets/playnext.png");
+        play = loadTexture("assets/play.png");
+        home = loadTexture("assets/home.png");
+        diamond = loadTexture("assets/diamond.png");
+        hint = loadTexture("assets/hint.png");
         for (int i = 0; i < MAX_BAD_GUESSES; ++i) {
             string path = "assets/st" + to_string(i) + ".png";
             stage.push_back(loadTexture(path.c_str()));
@@ -42,12 +52,16 @@ struct Graphics {
         win.push_back(loadTexture("assets/yeah1.png"));
     }
 
-    SDL_Rect clickButtonRect(SDL_Texture *texture) {
-        SDL_Rect rect;
-        SDL_QueryTexture(texture, NULL, NULL, &rect.w, &rect.h);
-        rect.x = 130;
-        rect.y = 220;
-        return rect;
+    void renderHomeScreen() {
+        prepareScene(background);
+        SDL_Texture* title = renderText("H A N G M A N", "assets/sarifa.ttf", 40, green);
+        SDL_Texture* underscore = renderText("_  _  _  _  _  _  _", "assets/sarifa.ttf", 39, green);
+        renderTextureMid(title, SCREEN_WIDTH / 2, 55, dest);
+        renderTextureMid(underscore, SCREEN_WIDTH / 2, 63, dest);
+        renderTextureMid(play, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, playButton);
+        SDL_DestroyTexture(title);
+        SDL_DestroyTexture(underscore);
+        presentScene();
     }
 
     void drawTextBox(const string& text, int centerX, int centerY, SDL_Color textColor, SDL_Color borderColor) {
@@ -88,20 +102,41 @@ struct Graphics {
 
     void render(const Hangman& game, Keyboard& keyboard) {
         prepareScene(background);
+        SDL_Texture* title = renderText("H A N G M A N", "assets/sarifa.ttf", 33, green);
+        SDL_Texture* underscore = renderText("_  _  _  _  _  _  _", "assets/sarifa.ttf", 32, green);
+        renderTextureMid(title, SCREEN_WIDTH / 2, 37, dest);
+        renderTextureMid(underscore, SCREEN_WIDTH / 2, 42, dest);
+        SDL_DestroyTexture(title);
+        SDL_DestroyTexture(underscore);
 
-        renderTexture(stage[game.badGuessCount], 0, 0);
+        renderTexture(stage[game.badGuessCount], 0, 0, dest);
+        renderTextureScaled(diamond, 13, 13, 0.9f, dest);
+        renderTextureScaled(hint, 565, 260, 1.0f, hintButton);
 
         string spaced = "";
         for (char c : game.guessedWord) {
             spaced += c;
             spaced += ' ';
         }
-
         SDL_Texture* guessedWord = renderText(spaced.c_str(), "assets/sarifa.ttf", 26, black);
+        renderTextureMid(guessedWord, 170, 150, dest);
+        SDL_DestroyTexture(guessedWord);
+
+        renderTextureScaled(diamond, 554, 238, 0.6f, dest);
+        SDL_Texture* hintScore = renderText("10/hint", "assets/sarifa.ttf", 17, blue);
+        renderTextureMid(hintScore, 600, 245, dest);
+        SDL_DestroyTexture(hintScore);
+
+        string levelText = "Level " + to_string(game.level);
+        SDL_Texture* levelTex = renderText(levelText.c_str(), "assets/sarifa.ttf", 20, blue);
+        renderTextureMid(levelTex, 440, 125, dest);
+        SDL_DestroyTexture(levelTex);
+
+        SDL_Texture* scoreText = renderText(to_string(game.score).c_str(), "assets/sarifa.ttf", 27, blue);
+        renderTexture(scoreText, 47, 7, dest);
+        SDL_DestroyTexture(scoreText);
 
         drawTextBox(game.currentEntry.category, 170, 100, blue, black);
-
-        renderTextureMid(guessedWord, 170, 150);
 
         renderKeyboard(keyboard);
 
@@ -110,6 +145,12 @@ struct Graphics {
 
     void renderFinalDisplay(const Hangman& game, int& i) {
         prepareScene(background);
+        SDL_Texture* title = renderText("H A N G M A N", "assets/sarifa.ttf", 33, green);
+        SDL_Texture* underscore = renderText("_  _  _  _  _  _  _", "assets/sarifa.ttf", 32, green);
+        renderTextureMid(title, SCREEN_WIDTH / 2, 37, dest);
+        renderTextureMid(underscore, SCREEN_WIDTH / 2, 42, dest);
+        SDL_DestroyTexture(title);
+        SDL_DestroyTexture(underscore);
 
         string spaced = "";
         for (char c : game.secretWord) {
@@ -117,23 +158,38 @@ struct Graphics {
             spaced += ' ';
         }
         SDL_Texture* guessedWord = renderText(spaced.c_str(), "assets/sarifa.ttf", 26, black);
+        renderTextureMid(guessedWord, 170, 150, dest);
+        SDL_DestroyTexture(guessedWord);
+
+        renderTextureScaled(diamond, 140, 215, 1.0f, dest);
 
         SDL_Texture* msg;
         if (game.lost()) {
-            renderTexture(lose[i % lose.size()], 0, 0);
+            renderTexture(lose[i % lose.size()], 0, 0, dest);
             i++;
-            msg = renderText("You lost!!!", "assets/sarifa.ttf", 20, black);
-            renderTexture(playAgain, 130, 220);
+            msg = renderText("You lost!!!", "assets/sarifa.ttf", 20, red);
+            renderTextureScaled(playAgain, 185, 260, 0.8f, playAgainButton);
+            renderTextureScaled(home, 82, 260, 0.8f, homeButton);
         } else if (game.won()) {
-            renderTexture(win[0], 0, 0);
+            renderTexture(win[0], 0, 0, dest);
             i++;
-            msg = renderText("You won!!!", "assets/sarifa.ttf", 20, black);
-            renderTexture(playNext, 130, 220);
+            msg = renderText("You won!!!", "assets/sarifa.ttf", 20, green);
+            renderTextureScaled(playNext, 135, 260, 0.8f, playNextButton);
         }
+        renderTextureMid(msg, 170, 190, dest);
+        SDL_DestroyTexture(msg);
+
+        string levelText = "Level " + to_string(game.level);
+        SDL_Texture* levelTex = renderText(levelText.c_str(), "assets/sarifa.ttf", 20, blue);
+        renderTextureMid(levelTex, 440, 125, dest);
+        SDL_DestroyTexture(levelTex);
+
+        SDL_Texture* scoreText = renderText(to_string(game.score).c_str(), "assets/sarifa.ttf", 27, blue);
+        renderTexture(scoreText, 177, 210, dest);
+        SDL_DestroyTexture(scoreText);
 
         drawTextBox(game.currentEntry.category, 170, 100, blue, black);
-        renderTextureMid(guessedWord, 170, 150);
-        renderTextureMid(msg, 170, 190);
+
         presentScene();
     }
 
@@ -268,9 +324,7 @@ struct Graphics {
         return texture;
     }
 
-    void renderTexture(SDL_Texture *texture, int x, int y) {
-        SDL_Rect dest;
-
+    void renderTexture(SDL_Texture *texture, int x, int y, SDL_Rect& dest) {
         dest.x = x;
         dest.y = y;
         SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
@@ -278,9 +332,7 @@ struct Graphics {
         SDL_RenderCopy(renderer, texture, NULL, &dest);
     }
 
-    void renderTextureMid(SDL_Texture *texture, int x, int y) {
-        SDL_Rect dest;
-
+    void renderTextureMid(SDL_Texture *texture, int x, int y, SDL_Rect& dest) {
         SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
 
         dest.x = x - dest.w / 2;
@@ -289,14 +341,30 @@ struct Graphics {
         SDL_RenderCopy(renderer, texture, NULL, &dest);
     }
 
+    void renderTextureScaled(SDL_Texture* texture, int x, int y, float scale, SDL_Rect& dest) {
+        SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
+        dest.w *= scale;
+        dest.h *= scale;
+        dest.x = x;
+        dest.y = y;
+        SDL_RenderCopy(renderer, texture, NULL, &dest);
+    }
 
     void quit() {
         TTF_Quit();
         IMG_Quit();
         for (auto tex : stage) SDL_DestroyTexture(tex);
+        for (auto tex : lose) SDL_DestroyTexture(tex);
+        for (auto tex : win) SDL_DestroyTexture(tex);
         SDL_DestroyTexture(background);
         SDL_DestroyTexture(correct);
         SDL_DestroyTexture(wrong);
+        SDL_DestroyTexture(playAgain);
+        SDL_DestroyTexture(playNext);
+        SDL_DestroyTexture(play);
+        SDL_DestroyTexture(home);
+        SDL_DestroyTexture(diamond);
+        SDL_DestroyTexture(hint);
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
