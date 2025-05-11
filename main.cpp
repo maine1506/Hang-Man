@@ -41,8 +41,9 @@ int main(int argc, char *argv[])
 
     int i = 0;
     bool quit = false;
-    bool clickButton = false;
     SDL_Event event;
+    SDL_Rect playAgain = graphics.clickButtonRect(graphics.playAgain);
+    SDL_Rect playNext = graphics.clickButtonRect(graphics.playNext);
 
     while (!quit) {
         SDL_PollEvent(&event);
@@ -53,35 +54,30 @@ int main(int argc, char *argv[])
         case SDL_MOUSEBUTTONDOWN:
             int x, y;
             SDL_GetMouseState(&x, &y);
-            processClick(x, y, keyboard, game);
 
             if (game.gameOver()) {
                 if (game.lost()
-                    && checkButtonClick(x, y, graphics.clickButtonRect(graphics.playAgain))
-                    && clickButton) {
+                && checkButtonClick(x, y, playAgain)) {
                     game.init();
                     keyboard.reset();
                     graphics.render(game, keyboard);
                     i = 0;
-                    clickButton = false;
                 }
                 else if (game.won()
-                         && checkButtonClick(x, y, graphics.clickButtonRect(graphics.playNext))
-                         && clickButton) {
+                && checkButtonClick(x, y, playNext)) {
                     game.init();
                     keyboard.reset();
                     graphics.render(game, keyboard);
                     i = 0;
-                    clickButton = false;
                 }
             } else {
-                graphics.render(game, keyboard);
+                processClick(x, y, keyboard, game);
+                if (!game.gameOver()) graphics.render(game, keyboard);
             }
             break;
         default:
             if (game.gameOver()) {
                 graphics.renderFinalDisplay(game, i);
-                clickButton = true;
                 SDL_Delay(140);
             }
         }

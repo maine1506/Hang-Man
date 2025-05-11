@@ -51,7 +51,6 @@ struct Graphics {
     }
 
     void drawTextBox(const string& text, int centerX, int centerY, SDL_Color textColor, SDL_Color borderColor) {
-        int thickness = 2;
         SDL_Texture* texture = renderText(text.c_str(), "assets/sarifa.ttf", 19, textColor);
 
         int textW, textH;
@@ -67,6 +66,7 @@ struct Graphics {
         };
 
         SDL_SetRenderDrawColor(renderer, borderColor.r, borderColor.g, borderColor.b, borderColor.a);
+        int thickness = 2;
         for (int i = 0; i < thickness; i++) {
             SDL_RenderDrawRect(renderer, &boxRect);
             boxRect.x += 1;
@@ -117,17 +117,17 @@ struct Graphics {
             spaced += ' ';
         }
         SDL_Texture* guessedWord = renderText(spaced.c_str(), "assets/sarifa.ttf", 26, black);
-        SDL_Texture* msg;
 
+        SDL_Texture* msg;
         if (game.lost()) {
             renderTexture(lose[i % lose.size()], 0, 0);
             i++;
-            msg = renderText("You lost!", "assets/sarifa.ttf", 20, black);
+            msg = renderText("You lost!!!", "assets/sarifa.ttf", 20, black);
             renderTexture(playAgain, 130, 220);
         } else if (game.won()) {
             renderTexture(win[0], 0, 0);
             i++;
-            msg = renderText("You won!", "assets/sarifa.ttf", 20, black);
+            msg = renderText("You won!!!", "assets/sarifa.ttf", 20, black);
             renderTexture(playNext, 130, 220);
         }
 
@@ -153,10 +153,13 @@ struct Graphics {
             SDL_DestroyTexture(texture);
 
             if (btn.clicked) {
+                int iconRectW, iconRectH;
+                SDL_QueryTexture(correct, NULL, NULL, &iconRectW, &iconRectH);
+
                 SDL_Rect iconRect = {
-                    btn.rect.x + (btn.rect.w - 26) / 2,
-                    btn.rect.y + (btn.rect.h - 26) / 2,
-                    26, 26
+                    btn.rect.x + (btn.rect.w - iconRectW) / 2,
+                    btn.rect.y + (btn.rect.h - iconRectH) / 2,
+                    iconRectW, iconRectH
                 };
 
                 if (btn.correct) {

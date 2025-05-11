@@ -51,7 +51,7 @@ struct Hangman {
             btn.correct = true;
             update(btn.letter);
         } else {
-            //btn.correct = false;
+            btn.correct = false;
             badGuessCount++;
         }
     }
