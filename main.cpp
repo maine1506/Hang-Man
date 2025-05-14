@@ -88,6 +88,9 @@ int main(int argc, char *argv[])
                     gameState = PLAYING;
                     graphics.render(game, keyboard);
                 }
+                else if (checkButtonClick(x, y, graphics.homeButton)) {
+                    gameState = HOME;
+                }
             }
             else if (gameState == LOSE) {
                 if (checkButtonClick(x, y, graphics.playAgainButton)) {
@@ -105,6 +108,9 @@ int main(int argc, char *argv[])
         }
 
         if (gameState == HOME) {
+            game.level = 1;
+            game.init();
+            keyboard.reset();
             graphics.renderHomeScreen();
         }
         else if (gameState == WIN || gameState == LOSE) {

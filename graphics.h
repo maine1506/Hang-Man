@@ -174,7 +174,8 @@ struct Graphics {
             renderTexture(win[0], 0, 0, dest);
             i++;
             msg = renderText("You won!!!", "assets/sarifa.ttf", 20, green);
-            renderTextureScaled(playNext, 135, 260, 0.8f, playNextButton);
+            renderTextureScaled(playNext, 185, 260, 0.8f, playNextButton);
+            renderTextureScaled(home, 82, 260, 0.8f, homeButton);
         }
         renderTextureMid(msg, 170, 190, dest);
         SDL_DestroyTexture(msg);

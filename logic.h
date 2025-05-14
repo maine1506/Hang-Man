@@ -124,6 +124,4 @@ struct Hangman {
 
 };
 
-
-
 #endif

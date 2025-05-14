@@ -14,7 +14,7 @@
 	<chrono>
 	<thread>
 
-1746987021 d:\game\hang-man\graphics.h
+1746988352 d:\game\hang-man\graphics.h
 	<SDL.h>
 	<SDL_image.h>
 	<SDL_ttf.h>
@@ -91,7 +91,7 @@
 
 1745441240 d:\game\hang-man\defs.h
 
-1746987756 d:\game\hang-man\logic.h
+1747025372 d:\game\hang-man\logic.h
 	<fstream>
 	<algorithm>
 	<ctime>
